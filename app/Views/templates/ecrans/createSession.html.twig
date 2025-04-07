@@ -1,0 +1,201 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+
+
+<section class="create-course-container">
+
+  <label class="toggle-switch-container">
+    <input class="toggle-switch-input" type="checkbox"
+      onChange="
+        document.getElementById('section-cours').style.display = this.checked ? 'block' : 'none';
+        document.getElementById('section-echange').style.display = this.checked ? 'none' : 'block';
+      "
+    >
+    <span class="toggle-switch-slider">
+      <p>{{traduction('echange')}}</p>
+      <p>{{traduction('cours')}}</p>
+      <span class="slider-container">
+        <span class="slider">
+        </span>
+      </span>
+    </span>
+  </label>
+  <script>
+  document.addEventListener('DOMContentLoaded', ()=>{
+
+let checked = document.querySelector('.toggle-switch-input').checked;
+        document.getElementById('section-cours').style.display = checked ? 'block' : 'none';
+        document.getElementById('section-echange').style.display = checked ? 'none' : 'block';
+    })
+
+  </script>
+
+<div id="section-echange">
+  <h1 class="page-title">{{traduction('echange')}}</h1>
+  <form class="form-creation-session" action="/createPartage" method="POST">
+
+    <div class="horizontal-display">
+      <div class="input-label-display">
+        <label for="skill_taught_id">{{ traduction('categorie') }}</label>
+        <select required class="input-goofy" id="skill_taught_id" name="skill_taught_id">
+            <option value="" disabled selected>{{ traduction('selectCategorie') }}</option>
+            {% for category in categories %}
+                <option value="{{ category[0] }}">{{ category[1] }}</option>
+            {% endfor %}
+        </select>
+      </div>
+
+      <div class="input-label-display">
+        <label for="description">{{traduction('competence')}}</label>
+        <input required class="input-goofy" id="description" name="description" placeholder="{{traduction('selectCompetence')}}">
+      </div>
+    </div>
+
+    <div class="horizontal-display">
+      <div class="input-label-display">
+        <label for="skill_requested_id">{{traduction('categorie')}}</label>
+        <select required class="input-goofy" id="skill_requested_id" name="skill_requested_id">
+            <option value="" disabled selected>{{ traduction('selectCategorie') }}</option>
+            {% for category in categories %}
+                <option value="{{ category[0] }}">{{ category[1] }}</option>
+            {% endfor %}
+        </select>
+      </div>
+
+      <div class="input-label-display">
+        <label for="competence-echange-2">{{traduction('competence')}}</label>
+        <input class="input-goofy" id="competence-echange-2" name="competence_requested" placeholder="{{traduction('selectCompetence')}}">
+      </div>
+    </div>
+
+    <div class="horizontal-display">
+      <div class="input-label-display">
+        <label for="date_session">{{traduction('date')}}</label>
+        <input required class="input-goofy" type="date" id="date_session" name="date_session">
+      </div>
+
+      <div class="input-label-display">
+        <label for="start_time">{{traduction('heureDebut')}}</label>
+        <input required class="input-goofy" type="time" id="start_time" name="start_time">
+      </div>
+
+      <div class="input-label-display">
+        <label for="end_time">{{traduction('heureFin')}}</label>
+        <input required class="input-goofy" type="time" id="end_time" name="end_time">
+      </div>
+    </div>
+
+    <!-- Champs cachés nécessaires -->
+    <input type="hidden" name="exchange_requester_id" value="{{ user.id }}">
+    <input type="hidden" name="rate_id" value="1">
+
+    <div style="margin-top: 1rem;" class="horizontal-display">
+      <button type="button" class="form-button dark-grey-bg">{{traduction('annuler')}}</button>
+      <button class="form-button green-bg" type="submit">{{traduction('creerEchange')}}</button>
+    </div>
+
+  </form>
+</div>
+
+  <div id="section-cours">
+
+    <h1 class="page-title">{{traduction('creationCours')}}</h1>
+
+    <form class="form-creation-session" action="/createCours" method="POST">
+
+      <div class="horizontal-display">
+
+        <div class="input-label-display">
+          <label for="skill_taught_id_cours">{{traduction('categorie')}}</label>
+          <select required class="input-goofy" id="skill_taught_id_cours" name="skill_taught_id">
+              <option value="" disabled selected>{{ traduction('selectCategorie') }}</option>
+              {% for category in categories %}
+                  <option value="{{ category[0] }}">{{ category[1] }}</option>
+              {% endfor %}
+          </select>
+        </div>
+
+        <div class="input-label-display">
+          <label for="description_cours">{{traduction('competence')}}</label>
+          <input required class="input-goofy" id="description_cours" name="description" placeholder="{{traduction('selectCompetence')}}">
+        </div>
+
+      </div>
+
+      <div class="horizontal-display">
+
+          <div class="input-label-display">
+              <label for="date_session_cours">{{traduction('date')}}</label>
+              <input required class="input-goofy" type="date" id="date_session_cours" name="date_session">
+          </div>
+
+          <div class="input-label-display">
+              <label for="start_time_cours">{{traduction('heureDebut')}}</label>
+              <input required class="input-goofy" type="time" id="start_time_cours" name="start_time" onchange="validateTimes()">
+          </div>
+
+          <div class="input-label-display">
+              <label for="end_time_cours">{{traduction('heureFin')}}</label>
+              <input required class="input-goofy" type="time" id="end_time_cours" name="end_time" onchange="validateTimes()">
+          </div>
+      <script>
+      function validateTimes() {
+          const heureDebut = document.getElementById('start_time_cours').value;
+          const heureFin = document.getElementById('end_time_cours').value;
+          if (heureDebut && heureFin) {
+              if (heureDebut >= heureFin) {
+                  alert("L'heure de début ne peut pas être après l'heure de fin.");
+                  document.getElementById('end_time_cours').value = '';
+              }
+          }
+      }
+      </script>
+      </div>
+
+
+<div class="horizontal-display">
+    <div class="input-label-display">
+        <label for="address">{{ traduction('adresse') }}</label>
+        <input required class="input-goofy" type="text" id="address" name="address" placeholder="{{ traduction('entrezAdresse') }}">
+    </div>
+</div>
+
+<div class="horizontal-display">
+    <div class="input-label-display">
+        <label for="city">{{ traduction('ville') }}</label>
+        <input required class="input-goofy" type="text" id="city" name="city" placeholder="{{ traduction('entrezVille') }}">
+    </div>
+
+    <div class="input-label-display">
+        <label for="zip_code">{{ traduction('codePostal') }}</label>
+        <input required class="input-goofy" type="text" id="zip_code" name="zip_code" placeholder="{{ traduction('entrezCodePostal') }}">
+    </div>
+</div>
+
+      <div class="horizontal-display">
+          <div class="input-label-display">
+              <label for="max_attendees">{{traduction('maximumParticipants')}}</label>
+              <input required class="input-goofy" type="number" id="max_attendees" name="max_attendees" placeholder="{{traduction('selectNbMaxParticipants')}}">
+          </div>
+      </div>
+
+      <!-- Champs cachés nécessaires -->
+      <input type="hidden" name="lesson_host_id" value="{{ user.id }}">
+      <input type="hidden" name="rate_id" value="1">
+
+      <div style="margin-top: 1rem;" class="horizontal-display">
+        <button type="button" class="form-button dark-grey-bg">{{traduction('annuler')}}</button>
+        <button class="form-button green-bg" type="submit">{{traduction('creerCours')}}</button>
+      </div>
+
+
+    </form>
+  </div>
+
+</section>
+
+
+{% endblock %}

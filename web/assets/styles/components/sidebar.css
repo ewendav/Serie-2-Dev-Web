@@ -1,0 +1,82 @@
+#sidebar {
+  width: min(25rem, 25%);
+  z-index: 10;
+  will-change: transform;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#sidebar-overlay {
+  opacity: 0;
+  z-index: 5;
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: opacity 200ms;
+  width: 100vw;
+  height: 100vh;
+  visibility: hidden;
+}
+
+/*responsive handling */
+@media all and (max-width: 991px) {
+  #sidebar {
+    position: absolute;
+    right: 0;
+    transform: translateX(110%);
+    top: 0;
+    height: 100%;
+    width: min(40rem, 40%);
+    border-radius: 0;
+    transition: transform 200ms;
+  }
+
+  #sidebar.open {
+    display: block;
+    transform: translateX(0%);
+  }
+
+  #sidebar.open + #sidebar-overlay {
+    opacity: 1;
+    background-color: #80808080;
+    visibility: visible;
+  }
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.user-info h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.user-info p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.login-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+  align-items: center;
+  width: 100%;
+}
+
+.login-buttons a {
+  text-decoration: none;
+  padding: 8px 12px;
+  text-align: center;
+  width: 80%;
+}

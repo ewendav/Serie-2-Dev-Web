@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>{% block title %}LearningShare{% endblock %}</title>
+
+        <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+
+        <link rel="stylesheet" href="{{asset('styles/app.css')}}">
+    </head>
+
+    <body id="bg">
+
+        {% include 'components/Navbar.html.twig' %}
+
+        <main class="container">
+            {% block body %}{% endblock %}
+        </main>
+
+        <!-- afficher la sidebar seuelemt si l'utilsiateur est loggé -->
+        {% if user %}
+
+          {% include 'components/Sidebar.html.twig' %}
+
+        {% endif %}
+
+    </body>
+</html>

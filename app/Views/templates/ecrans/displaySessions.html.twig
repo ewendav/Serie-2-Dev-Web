@@ -1,0 +1,138 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+
+
+<section class="create-course-container">
+  
+  {% if success %}
+    <div style="background-color: #4CAF50; color: white; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+        {{ success }}
+    </div>
+  {% endif %}
+  
+  {% if error %}
+    <div style="background-color: #f44336; color: white; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+        {{ error }}
+    </div>
+  {% endif %}
+
+  <div class="horizontal-display">
+
+<label class="toggle-switch-container">
+    <input class="toggle-switch-input" type="checkbox"
+           {% if getParams.type == 'cours' %} checked {% endif %}
+           onClick="
+               window.location.href = this.checked ? '/sessions?type=cours' : '/sessions?type=echange';
+           "
+           id="yourCheckboxId">
+    <span class="toggle-switch-slider">
+        <p>{{ traduction('echange') }}</p>
+        <p>{{ traduction('cours') }}</p>
+        <span class="slider-container">
+            <span class="slider"></span>
+        </span>
+    </span>
+</label>
+
+
+<form method="get" action="/sessions">
+  <input placeholder="{{ traduction('rechercherSkill') }}" class="input-goofy" 
+         style="width:20rem;"
+         type="text" id="recherche" name="q">
+  <input type="hidden" name="type" value="{{ (getParams.type == 'cours') ? 'cours' : 'echange' | trim }}">
+</form>
+
+  <div style="display:flex;gap:1rem;">
+
+  <a href="/login"
+
+style="
+{% if user %}
+opacity:0;
+    {% endif %}
+"
+
+  >
+          <button class="form-button" style="background-color:white; color:black;">{{traduction('login')}}</button>
+  </a>
+
+  <a href="/register"
+
+
+style="
+{% if user %}
+opacity:0;
+    {% endif %}
+"
+  >
+          <button class="form-button" style="background-color:black;" type="submit">{{traduction('register')}}</button>
+  </a>
+
+  </div>
+
+  </div>
+
+{% if getParams.type == "cours" %}
+
+<div id="section-cours-display">
+    {% if sessions is empty %}
+        <p>{{ traduction('noData') }}</p>
+    {% else %}
+        {% for session in sessions %}
+            {% include 'components/lessonCard.html.twig' with {
+                'avatar_path': session.host_avatar is not empty ? session.host_avatar : '',
+                'userName': session.host_first_name ~ ' ' ~ session.host_last_name,
+                'userId' : session.host_user_id,
+                'categoryLearned': categoriesIndexed[session.skill_taught_category_id] is defined ? categoriesIndexed[session.skill_taught_category_id][1] : '',
+                'skillLearned': session.skill_taught_name is not empty ? session.skill_taught_name : '',
+                'skill_taught_category_id': session.skill_taught_category_id,
+                'adresse': session.full_address is not empty ? session.full_address : '',
+                'date': session.date_session ~ ', ' ~ session.start_time|date('H:i'),
+                'session_id': session.lesson_session_id is defined ? session.lesson_session_id : session.session_id,
+                'user': user,
+                'startTime': session.start_time,
+                'endTime': session.end_time,
+                'dateDebut': session.date_session,
+            } %}
+        {% endfor %}
+    {% endif %}
+</div>
+
+{% else %}
+
+<div id="section-echange-display">
+    {% if sessions is empty %}
+        <p>{{ traduction('noData') }}</p>
+    {% else %}
+        {% for session in sessions %}
+            {% include 'components/exchangeCard.html.twig' with {
+                'avatar_path': session.requester_avatar is not empty ? session.requester_avatar : '',
+                'userName': session.requester_first_name ~ ' ' ~ session.requester_last_name,
+                'userId' : session.requester_user_id,
+                'categoryLearned': categoriesIndexed[session.skill_taught_category_id] is defined ? categoriesIndexed[session.skill_taught_category_id][1] : '',
+                'skillLearned': session.skill_taught_name is not empty ? session.skill_taught_name : '',
+                'categoryWanted': categoriesIndexed[session.skill_requested_category_id] is defined ? categoriesIndexed[session.skill_requested_category_id][1] : '',
+                'skillWanted': session.skill_requested_name is not empty ? session.skill_requested_name : '',
+                'skill_taught_category_id': session.skill_taught_category_id,
+                'skill_requested_category_id': session.skill_requested_category_id,
+                'session_id': session.lesson_session_id is defined ? session.lesson_session_id : session.session_id,
+                'user': user,
+                'startTime': session.start_time,
+                'endTime': session.end_time,
+                'dateDebut': session.date_session,
+            } %}
+        {% endfor %}
+
+    {% endif %}
+</div>
+
+{% endif %}
+
+
+</section>
+
+
+{% endblock %}
