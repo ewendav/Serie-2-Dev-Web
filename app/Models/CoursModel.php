@@ -238,10 +238,10 @@ class CoursModel
         ";
             // Prepare the statement
             $stmt = $this->pdo->prepare($query);
-            
+
             // Lier l'ID utilisateur
             $stmt->bindParam(':user_id', $userId);
-            
+
             if (!empty($skillName)) {
                 $stmt->bindValue(':skillName', '%' . $skillName . '%');
             }
@@ -250,26 +250,25 @@ class CoursModel
             $lessons = [];
 
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                if ($retourneJson) {
-                    $lessons[] = [
-                    'lesson_session_id' => $row['lesson_session_id'],
-                    'start_time' => $row['start_time'],
-                    'end_time' => $row['end_time'],
-                    'date_session' => $row['date_session'],
-                    'description' => $row['description'],
-                    'rate_id' => $row['rate_id'],
-                    'max_attendees' => $row['max_attendees'],
-                    'current_attendees' => $row['current_attendees'],
-                    'host_first_name' => $row['host_first_name'],
-                    'host_last_name' => $row['host_last_name'],
-                    'host_avatar' => $row['host_avatar'],
-                    'host_user_id' => $row['host_user_id'],
-                    'skill_taught_id' => $row['skill_taught_id'],
-                    'skill_taught_category_id' => $row['skill_taught_category_id'],
-                    'skill_taught_name' => $row['skill_taught_name'],
-                    'full_address' => $row['full_address'],
-                    ];
-                }
+                $lessons[] = [
+                'lesson_session_id' => $row['lesson_session_id'],
+                'start_time' => $row['start_time'],
+                'end_time' => $row['end_time'],
+                'date_session' => $row['date_session'],
+                'description' => $row['description'],
+                'rate_id' => $row['rate_id'],
+                'max_attendees' => $row['max_attendees'],
+                'current_attendees' => $row['current_attendees'],
+                'host_first_name' => $row['host_first_name'],
+                'host_last_name' => $row['host_last_name'],
+                'host_avatar' => $row['host_avatar'],
+                'host_user_id' => $row['host_user_id'],
+                'skill_taught_id' => $row['skill_taught_id'],
+                'skill_taught_category_id' => $row['skill_taught_category_id'],
+                'skill_taught_name' => $row['skill_taught_name'],
+                'full_address' => $row['full_address'],
+                ];
+                // Le paramètre retourneJson n'a plus d'effet, on retourne toujours le même format
             }
             $this->logger->info("Récupération de toutes les leçons disponibles", ['lessons_count' => count($lessons)]);
             return $lessons;
@@ -440,8 +439,10 @@ class CoursModel
         COUNT(a.attend_user_id) AS current_attendees,
         req_user.user_first_name AS host_first_name,
         req_user.user_last_name AS host_last_name,
+        req_user.user_id AS host_user_id,
         req_user.avatar_path AS host_avatar,
         taught_skill.skill_id AS skill_taught_id,
+        taught_skill.category_id AS skill_taught_category_id,
         taught_skill.skill_name AS skill_taught_name,
         CONCAT(loc.address, ', ', loc.zip_code, ', ', loc.city) AS full_address
     FROM
@@ -460,7 +461,7 @@ class CoursModel
         a.attend_user_id = :user_id
         AND CONCAT(s.date_session, ' ', s.end_time) > NOW()
     GROUP BY
-        s.session_id, s.start_time, s.end_time, s.date_session, s.description, s.rate_id, l.location_id, l.lesson_host_id, l.max_attendees, req_user.user_first_name, req_user.user_last_name, req_user.avatar_path, taught_skill.skill_id, taught_skill.skill_name, loc.address, loc.zip_code, loc.city
+        s.session_id, s.start_time, s.end_time, s.date_session, s.description, s.rate_id, l.location_id, l.lesson_host_id, l.max_attendees, req_user.user_first_name, req_user.user_last_name, req_user.avatar_path, taught_skill.skill_id, taught_skill.category_id, taught_skill.skill_name, loc.address, loc.zip_code, loc.city
 ");
             $stmt->bindParam(':user_id', $user_id);
             $stmt->execute();
@@ -482,7 +483,9 @@ class CoursModel
                     'host_first_name' => $row['host_first_name'],
                     'host_last_name' => $row['host_last_name'],
                     'host_avatar' => $row['host_avatar'],
+                    'host_user_id' => $row['host_user_id'],
                     'skill_taught_id' => $row['skill_taught_id'],
+                    'skill_taught_category_id' => $row['skill_taught_category_id'],
                     'skill_taught_name' => $row['skill_taught_name'],
                     'full_address' => $row['full_address'],
                 ];
@@ -518,6 +521,7 @@ class CoursModel
         l.max_attendees,
         COUNT(a.attend_user_id) AS current_attendees,
         taught_skill.skill_id AS skill_taught_id,
+        taught_skill.category_id AS skill_taught_category_id,
         taught_skill.skill_name AS skill_taught_name,
         CONCAT(loc.address, ', ', loc.zip_code, ', ', loc.city) AS full_address
     FROM
@@ -534,7 +538,7 @@ class CoursModel
         l.lesson_host_id = :host_id
         AND CONCAT(s.date_session, ' ', s.end_time) > NOW()
     GROUP BY
-        s.session_id, s.start_time, s.end_time, s.date_session, s.description, s.rate_id, l.location_id, l.lesson_host_id, l.max_attendees, taught_skill.skill_id, taught_skill.skill_name, loc.address, loc.zip_code, loc.city
+        s.session_id, s.start_time, s.end_time, s.date_session, s.description, s.rate_id, l.location_id, l.lesson_host_id, l.max_attendees, taught_skill.skill_id, taught_skill.category_id, taught_skill.skill_name, loc.address, loc.zip_code, loc.city
 ");
 
             $stmt->bindParam(':host_id', $host_id);
@@ -555,6 +559,7 @@ class CoursModel
                     'max_attendees' => $row['max_attendees'],
                     'current_attendees' => $row['current_attendees'],
                     'skill_taught_id' => $row['skill_taught_id'],
+                    'skill_taught_category_id' => $row['skill_taught_category_id'],
                     'skill_taught_name' => $row['skill_taught_name'],
                     'full_address' => $row['full_address'],
                 ];
