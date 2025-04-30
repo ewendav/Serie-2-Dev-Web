@@ -101,7 +101,7 @@ Voici les principaux packages utilisés via Composer :
 - 🎓 = Session de type **cours (lesson)**
 - 🔁 = Session de type **échange (exchange)**
 
-### Utiliser en ligne
+### Utiliser en ligne > Désactivé le 26/04/25
 
 https://learningshare.gabin-prive.byraven.fr/
 
